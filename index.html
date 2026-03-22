@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<title>Phân tích Cation Nhóm I</title>
+
+<style>
+  body{
+    font-family: Arial;
+    padding:20px;
+    background:#f5f7fa;
+    text-align:center;
+    padding-bottom:80px;
+  }
+
+  h1{color:#0077cc}
+  h2{color:#0077cc}
+
+  .note{
+    color:#444;
+    margin-bottom:15px;
+    line-height:1.6;
+  }
+
+  button{
+    display:block;
+    margin:8px auto;
+    padding:12px;
+    width:90%;
+    max-width:420px;
+    border-radius:10px;
+    border:1px solid #ccc;
+    background:white;
+    cursor:pointer;
+    font-size:15px;
+  }
+
+  button:hover{background:#eaf6ff}
+
+  button.disabled{
+  background:#ddd;
+  cursor:not-allowed;
+  pointer-events:none; /* 👈 thêm dòng này */
+}
+
+  #resultBox{
+    position:fixed;
+    bottom:0;
+    left:0;
+    width:100%;
+    background:#fff3cd;
+    border-top:2px solid #ffc107;
+    padding:10px;
+  }
+</style>
+</head>
+
+<body>
+
+<h1>🔬 Phân tích Cation Nhóm I</h1>
+<div id="cationArea"></div>
+
+<div id="resultBox">Chưa có kết quả</div>
+
+<script>
+
+/* ================== SETUP ================== */
+const cationArea = document.getElementById('cationArea');
+const resultBox = document.getElementById('resultBox');
+
+let cationResults = [];
+let testedPb = false;
+let testedAg = false;
+
+/* ================== UPDATE RESULT ================== */
+function updateResult(){
+  let kq = cationResults.length ? cationResults.join(', ') : 'Chưa xác định';
+  resultBox.innerHTML = `<b>Dung dịch chứa:</b> ${kq}`;
+}
+
+/* ================== ADD ================== */
+function addCation(ion){
+  if(!cationResults.includes(ion)){
+    cationResults.push(ion);
+  }
+  updateResult();
+}
+
+/* ================== RESET ================== */
+function resetTest(){
+  cationResults = [];
+  testedPb = false;
+  testedAg = false;
+  updateResult();
+  cationGroup1();
+}
+
+/* ================== KHÔNG CÓ NHÓM I ================== */
+function noGroup1(){
+  resultBox.innerHTML = "Không có cation nhóm I (Ag⁺, Pb²⁺)";
+}
+
+/* ================== BƯỚC 1 ================== */
+function cationGroup1(){
+  cationArea.innerHTML = `
+    <h2>Bước 1: Thêm HCl 6M</h2>
+
+    <p class="note">
+      Quan sát sự tạo tủa:
+    </p>
+
+    <button onclick="cation1_hasPpt()">⚗️ Có tủa trắng</button>
+    <button onclick="noGroup1()">❌ Không có tủa</button>
+  `;
+}
+
+/* ================== BƯỚC 2 ================== */
+function cation1_hasPpt(){
+  cationArea.innerHTML = `
+    <h2>Bước 2: Xử lý tủa</h2>
+
+    <p class="note">
+      Ly tâm lấy tủa, thêm nhiều nước và đun nóng
+    </p>
+
+    <button onclick="cation1_all_dissolve()">💧 Tan hoàn toàn</button>
+    <button onclick="cation1_partial()">⚖️ Vẫn còn tủa</button>
+  `;
+}
+
+/* ================== NHÁNH Pb ================== */
+function cation1_all_dissolve(){
+  cationArea.innerHTML = `
+    <h2>Xác định Pb²⁺</h2>
+
+    <p class="note">
+      Thêm KI → xuất hiện tủa vàng PbI₂<br>
+      Đun nóng → tan<br>
+      Làm nguội → mưa vàng xuất hiện lại
+    </p>
+
+    <button onclick="addCation('Pb²⁺')">
+      🟡 Có mưa vàng → Pb²⁺
+    </button>
+
+    <button onclick="updateResult()">❌ Không có hiện tượng</button>
+  `;
+}
+
+/* ================== NHÁNH TÁCH ================== */
+function cation1_partial(){
+  renderSplit();
+}
+
+/* ================== RENDER ================== */
+function renderSplit(){
+  cationArea.innerHTML = `
+    <h2>Bước 3: Ly tâm – tách</h2>
+
+    <p class="note">
+      Ly tâm tách riêng tủa và dung dịch:<br><br>
+
+      🔹 Dung dịch (có thể có Pb²⁺) → Kiểm tra Pb²⁺<br>
+      🔹 Tủa (có thể là AgCl) → Kiểm tra Ag⁺
+    </p>
+
+    <button 
+  onclick="testPb()" 
+  class="${testedPb ? 'disabled' : ''}"
+>
+      🧪 Kiểm tra dung dịch (Pb²⁺)
+    </button>
+
+    <button 
+  onclick="testAg()" 
+  class="${testedAg ? 'disabled' : ''}"
+>
+      ⚗️ Kiểm tra tủa (Ag⁺)
+    </button>
+  `;
+}
+
+/* ================== TEST Pb ================== */
+function testPb(){
+  if(testedPb) return;
+
+  cationArea.innerHTML = `
+    <h2>Kiểm tra Pb²⁺</h2>
+
+    <p class="note">
+      Thêm KI vào dung dịch → xuất hiện tủa vàng PbI₂<br>
+      Đun nóng → tan<br>
+      Làm nguội → mưa vàng xuất hiện lại
+    </p>
+
+    <button onclick="confirmPb(true)">✔ Có mưa vàng</button>
+    <button onclick="confirmPb(false)">❌ Không có hiện tượng</button>
+  `;
+}
+
+function confirmPb(result){
+  testedPb = true;
+
+  if(result){
+    addCation('Pb²⁺');
+  }
+
+  renderSplit();
+}
+
+/* ================== TEST Ag ================== */
+function testAg(){
+  if(testedAg) return;
+
+  cationArea.innerHTML = `
+    <h2>Kiểm tra Ag⁺</h2>
+
+    <p class="note">
+      Thêm NH₄OH đậm đặc → Tủa tan<br>
+      Thêm HNO₃ đậm đặc → Kết tủa xuất hiện trở lại<br>
+    </p>
+
+    <button onclick="confirmAg(true)">✔ Có đúng hiện tượng</button>
+    <button onclick="confirmAg(false)">❌ Không hiện tượng</button>
+  `;
+}
+
+function confirmAg(result){
+  testedAg = true;
+
+  if(result){
+    addCation('Ag⁺');
+  }
+
+  renderSplit();
+}
+
+/* ================== START ================== */
+updateResult();
+cationGroup1();
+
+</script>
+
+</body>
+</html>
